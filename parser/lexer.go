@@ -90,7 +90,6 @@ func (l *Lexer) collectNewLine() {
 	for l.currentItem == '\n' {
 		l.next()
 	}
-	fmt.Println(l.currentItem, '\n')
 }
 
 func (l *Lexer) collectString() {
