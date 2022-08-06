@@ -3,7 +3,20 @@ package parser
 import (
 	"bytes"
 	"fmt"
+	"strings"
 )
+
+var keywords = [...]string{
+	"if",
+	"is",
+	"or",
+	"and",
+	"loop",
+	"in",
+	"at",
+	"on",
+	"while",
+}
 
 type Lexer struct {
 	text        string
@@ -54,6 +67,10 @@ func (l *Lexer) collectName() {
 		result.WriteRune(l.currentItem)
 		l.next()
 	}
+	for index, itemOfSplit := range strings.Split(result.String(), " ") {
+		fmt.Printf("%d: %s\n", index, itemOfSplit)
+	}
+	fmt.Println()
 	l.appendToken(NAME, &result)
 }
 
