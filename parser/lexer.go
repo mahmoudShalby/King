@@ -58,11 +58,10 @@ func (l *Lexer) collectName() {
 	for l.currentItem != 0 && (l.isCurrentItemLetter() || l.isCurrentItemNumber() || l.currentItem == ' ') {
 		if l.currentItem == ' ' {
 			l.next()
-			if l.isCurrentItemLetter() {
-				result.WriteRune(' ')
-			} else {
-				break
-			}
+			l.appendToken(NAME, &result)
+			result.Reset()
+			l.next()
+			continue
 		}
 		result.WriteRune(l.currentItem)
 		l.next()
@@ -71,7 +70,9 @@ func (l *Lexer) collectName() {
 		fmt.Printf("%d: %s\n", index, itemOfSplit)
 	}
 	fmt.Println()
-	l.appendToken(NAME, &result)
+	if result.Len() != 0 {
+		l.appendToken(NAME, &result)
+	}
 }
 
 func (l *Lexer) isCurrentItemNumber() bool {
