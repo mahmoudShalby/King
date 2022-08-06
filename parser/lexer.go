@@ -57,11 +57,12 @@ func (l *Lexer) collectName() {
 	l.next()
 	for l.currentItem != 0 && (l.isCurrentItemLetter() || l.isCurrentItemNumber() || l.currentItem == ' ') {
 		if l.currentItem == ' ' {
-			l.next()
 			l.appendToken(NAME, &result)
 			result.Reset()
 			l.next()
-			continue
+			if !l.isCurrentItemLetter() {
+				continue
+			}
 		}
 		result.WriteRune(l.currentItem)
 		l.next()
