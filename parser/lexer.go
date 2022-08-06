@@ -3,7 +3,6 @@ package parser
 import (
 	"bytes"
 	"fmt"
-	"strings"
 )
 
 var keywords = [...]string{
@@ -43,7 +42,7 @@ func (l *Lexer) next() {
 	}
 }
 
-func (l *Lexer) appendToken(T TokenType, V *bytes.Buffer) {
+func (l *Lexer) appendToken(T TokenType, V bytes.Buffer) {
 	l.Tokens = append(l.Tokens, Token{T, V})
 }
 
@@ -57,22 +56,20 @@ func (l *Lexer) collectName() {
 	l.next()
 	for l.currentItem != 0 && (l.isCurrentItemLetter() || l.isCurrentItemNumber() || l.currentItem == ' ') {
 		if l.currentItem == ' ' {
-			l.appendToken(NAME, &result)
-			result.Reset()
-			l.next()
-			if !l.isCurrentItemLetter() {
-				continue
+			if result.Len() != 0 {
+				var new_result bytes.Buffer
+				new_result.WriteString(result.String())
+				l.appendToken(NAME, new_result)
+				result.Reset()
 			}
+			l.next()
+			continue
 		}
 		result.WriteRune(l.currentItem)
 		l.next()
 	}
-	for index, itemOfSplit := range strings.Split(result.String(), " ") {
-		fmt.Printf("%d: %s\n", index, itemOfSplit)
-	}
-	fmt.Println()
 	if result.Len() != 0 {
-		l.appendToken(NAME, &result)
+		l.appendToken(NAME, result)
 	}
 }
 
@@ -97,14 +94,14 @@ func (l *Lexer) collectNumber() {
 		l.next()
 	}
 	if isResultHasDot {
-		l.appendToken(FLOAT, &result)
+		l.appendToken(FLOAT, result)
 	} else {
-		l.appendToken(INT, &result)
+		l.appendToken(INT, result)
 	}
 }
 
 func (l *Lexer) collectNewLine() {
-	l.appendToken(NEWLINE, &bytes.Buffer{})
+	l.appendToken(NEWLINE, bytes.Buffer{})
 	l.next()
 	for l.currentItem == '\n' {
 		l.next()
@@ -119,7 +116,7 @@ func (l *Lexer) collectString() {
 		l.next()
 	}
 	l.next()
-	l.appendToken(STRING, &result)
+	l.appendToken(STRING, result)
 }
 
 func (l *Lexer) collectTokens() {
@@ -140,8 +137,8 @@ func (l *Lexer) collectTokens() {
 }
 
 func (l *Lexer) printTokens() {
-	fmt.Println("Tokens:")
-	for index := 0; index < len(l.Tokens); index++ {
-		fmt.Printf("\t%d:\t%s\n", l.Tokens[index].T, l.Tokens[index].V.String())
+	fmt.Println("\x1b[1;32mTokens:\x1b[0m")
+	for _, token := range l.Tokens {
+		fmt.Printf("\x1b[1;37m%v: %v\x1b[0m\n", token.T, token.V.String())
 	}
 }

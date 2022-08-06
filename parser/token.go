@@ -19,5 +19,5 @@ const (
 
 type Token struct {
 	T TokenType
-	V *bytes.Buffer
+	V bytes.Buffer
 }

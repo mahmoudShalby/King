@@ -1,6 +1,4 @@
 a = 1234
 
 if a is 5
-
-
   print a
