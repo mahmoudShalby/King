@@ -50,16 +50,34 @@ func (l *Lexer) isCurrentItemLetter() bool {
 	return 'a' <= l.currentItem && l.currentItem <= 'z' || 'A' <= l.currentItem && l.currentItem <= 'Z'
 }
 
+func (l *Lexer) appendNameToken(name string) {
+	var new_result bytes.Buffer
+	new_result.WriteString(name)
+	var t TokenType
+	for _, keyword := range keywords {
+		if name == keyword {
+			t = KEYWORD
+			break
+		}
+	}
+	if t == 0 {
+		if name == "true" || name == "false" {
+			t = BOOL
+		} else {
+			t = NAME
+		}
+	}
+	l.appendToken(t, new_result)
+}
+
 func (l *Lexer) collectName() {
 	var result bytes.Buffer
 	result.WriteRune(l.currentItem)
 	l.next()
-	for l.currentItem != 0 && (l.isCurrentItemLetter() || l.isCurrentItemNumber() || l.currentItem == ' ') {
+	for l.currentItem != 0 && (l.isCurrentItemLetter() || l.currentItem == ' ') {
 		if l.currentItem == ' ' {
 			if result.Len() != 0 {
-				var new_result bytes.Buffer
-				new_result.WriteString(result.String())
-				l.appendToken(NAME, new_result)
+				l.appendNameToken(result.String())
 				result.Reset()
 			}
 			l.next()
@@ -69,7 +87,7 @@ func (l *Lexer) collectName() {
 		l.next()
 	}
 	if result.Len() != 0 {
-		l.appendToken(NAME, result)
+		l.appendNameToken(result.String())
 	}
 }
 
