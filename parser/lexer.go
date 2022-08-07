@@ -1,10 +1,8 @@
 package parser
 
-import (
-	"bytes"
-	"fmt"
-)
+import "bytes"
 
+// Name that will get type KEYWORD by lexer
 var keywords = [...]string{
 	"if",
 	"is",
@@ -17,6 +15,7 @@ var keywords = [...]string{
 	"while",
 }
 
+// Lexer's base object
 type Lexer struct {
 	text        string
 	textLength  uint
@@ -25,14 +24,15 @@ type Lexer struct {
 	Tokens      []Token
 }
 
+// The initialize function of lexer just call it to use lexer
 func (l *Lexer) Init(text string) {
 	l.text = text
 	l.textLength = uint(len(text))
 	l.currentItem = rune(text[0])
 	l.collectTokens()
-	l.printTokens()
 }
 
+// Set the next character of (*Lexer).text in (*Lexer).currentItem and increment the (*Lexer).textPointer
 func (l *Lexer) next() {
 	l.textPointer++
 	if l.textPointer < l.textLength {
@@ -42,14 +42,17 @@ func (l *Lexer) next() {
 	}
 }
 
+// Append new token
 func (l *Lexer) appendToken(T TokenType, V bytes.Buffer) {
 	l.Tokens = append(l.Tokens, Token{T, V})
 }
 
+// Check if (*Lexer).currentItem is letter
 func (l *Lexer) isCurrentItemLetter() bool {
 	return 'a' <= l.currentItem && l.currentItem <= 'z' || 'A' <= l.currentItem && l.currentItem <= 'Z'
 }
 
+// Append name token -type> got by the value -value> @param name
 func (l *Lexer) appendNameToken(name string) {
 	var new_result bytes.Buffer
 	new_result.WriteString(name)
@@ -70,6 +73,7 @@ func (l *Lexer) appendNameToken(name string) {
 	l.appendToken(t, new_result)
 }
 
+// Collect names then append it with (*Lexer).appendNameToken
 func (l *Lexer) collectName() {
 	var result bytes.Buffer
 	result.WriteRune(l.currentItem)
@@ -91,10 +95,12 @@ func (l *Lexer) collectName() {
 	}
 }
 
+// Check if (*Lexer).currentItem is number
 func (l *Lexer) isCurrentItemNumber() bool {
 	return '0' <= l.currentItem && l.currentItem <= '9'
 }
 
+// Collect numbers
 func (l *Lexer) collectNumber() {
 	var result bytes.Buffer
 	isResultHasDot := false
@@ -118,10 +124,12 @@ func (l *Lexer) collectNumber() {
 	}
 }
 
+// Check if (*Lexer).currentItem is whitespace
 func (l *Lexer) isCurrentItemWhitespace() bool {
 	return l.currentItem == ' ' || l.currentItem == '\n' || l.currentItem == '\t'
 }
 
+// Collect newlines -value> just one newline and ignore others to find any other thing
 func (l *Lexer) collectNewLine() {
 	l.appendToken(NEWLINE, bytes.Buffer{})
 	l.next()
@@ -130,6 +138,7 @@ func (l *Lexer) collectNewLine() {
 	}
 }
 
+// Collect tabes -value> number of tabs
 func (l *Lexer) collectTab() {
 	var value uint8 = 1
 	l.next()
@@ -142,6 +151,7 @@ func (l *Lexer) collectTab() {
 	l.appendToken(TAB, value_as_buffer)
 }
 
+// Collect Strings
 func (l *Lexer) collectString() {
 	var result bytes.Buffer
 	l.next()
@@ -153,6 +163,7 @@ func (l *Lexer) collectString() {
 	l.appendToken(STRING, result)
 }
 
+// Collect any thing isn't letter, number or whitespace
 func (l *Lexer) collectPunctuation() {
 	var result bytes.Buffer
 	l.next()
@@ -163,6 +174,7 @@ func (l *Lexer) collectPunctuation() {
 	l.appendToken(PUNCTUATION, result)
 }
 
+// Collect tokens from (*Lexer).text
 func (l *Lexer) collectTokens() {
 	for l.currentItem != 0 {
 		switch {
@@ -182,9 +194,13 @@ func (l *Lexer) collectTokens() {
 	}
 }
 
-func (l *Lexer) printTokens() {
-	fmt.Println("\x1b[1;32mTokens:\x1b[0m")
-	for _, token := range l.Tokens {
-		fmt.Printf("\x1b[1;37m%v: %v\x1b[0m\n", token.T, token.V.String())
-	}
-}
+// UnComment this and run this function at the end of (*Lexer).Init function
+// if you want to see tokens after collect it
+
+// Print tokens that collected by collectTokens
+// func (l *Lexer) printTokens() {
+// 	fmt.Println("\x1b[1;32mTokens:\x1b[0m")
+// 	for _, token := range l.Tokens {
+// 		fmt.Printf("\x1b[1;37m%v: %v\x1b[0m\n", token.T, token.V.String())
+// 	}
+// }
