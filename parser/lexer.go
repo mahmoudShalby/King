@@ -118,12 +118,28 @@ func (l *Lexer) collectNumber() {
 	}
 }
 
+func (l *Lexer) isCurrentItemWhitespace() bool {
+	return l.currentItem == ' ' || l.currentItem == '\n' || l.currentItem == '\t'
+}
+
 func (l *Lexer) collectNewLine() {
 	l.appendToken(NEWLINE, bytes.Buffer{})
 	l.next()
 	for l.currentItem == '\n' {
 		l.next()
 	}
+}
+
+func (l *Lexer) collectTab() {
+	var value uint8 = 1
+	l.next()
+	for l.currentItem == '\t' {
+		value++
+		l.next()
+	}
+	var value_as_buffer bytes.Buffer
+	value_as_buffer.WriteRune(rune('0' + value))
+	l.appendToken(TAB, value_as_buffer)
 }
 
 func (l *Lexer) collectString() {
@@ -137,6 +153,16 @@ func (l *Lexer) collectString() {
 	l.appendToken(STRING, result)
 }
 
+func (l *Lexer) collectPunctuation() {
+	var result bytes.Buffer
+	l.next()
+	for !(l.isCurrentItemLetter() || l.isCurrentItemNumber() || l.isCurrentItemWhitespace()) {
+		result.WriteRune(l.currentItem)
+		l.next()
+	}
+	l.appendToken(PUNCTUATION, result)
+}
+
 func (l *Lexer) collectTokens() {
 	for l.currentItem != 0 {
 		switch {
@@ -146,10 +172,12 @@ func (l *Lexer) collectTokens() {
 			l.collectNumber()
 		case l.currentItem == '\n':
 			l.collectNewLine()
+		case l.currentItem == '\t':
+			l.collectTab()
 		case l.currentItem == '"':
 			l.collectString()
 		default:
-			l.next()
+			l.collectPunctuation()
 		}
 	}
 }
