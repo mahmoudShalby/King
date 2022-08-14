@@ -10,7 +10,8 @@ import (
 func main() {
 	text := readFile("a.king")
 	if len(text) != 0 {
-		parser.StartParsing(text)
+		var p parser.Parser
+		p.Init(text)
 	}
 }
 

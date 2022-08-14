@@ -1,18 +1,13 @@
 package parser
 
-import "bytes"
+import (
+	"bytes"
+	"strings"
+)
 
 // Name that will get type KEYWORD by lexer
 var keywords = [...]string{
-	"if",
-	"is",
-	"or",
-	"and",
-	"loop",
-	"in",
-	"at",
-	"on",
-	"while",
+	"name",
 }
 
 // Lexer's base object
@@ -21,11 +16,11 @@ type Lexer struct {
 	textLength  uint
 	textPointer uint
 	currentItem rune
-	Tokens      []Token
+	tokens      []Token
 }
 
 // The initialize function of lexer just call it to use lexer
-func (l *Lexer) Init(text string) {
+func (l *Lexer) init(text string) {
 	l.text = text
 	l.textLength = uint(len(text))
 	l.currentItem = rune(text[0])
@@ -44,7 +39,7 @@ func (l *Lexer) next() {
 
 // Append new token
 func (l *Lexer) appendToken(T TokenType, V bytes.Buffer) {
-	l.Tokens = append(l.Tokens, Token{T, V})
+	l.tokens = append(l.tokens, Token{T, V})
 }
 
 // Check if (*Lexer).currentItem is letter
@@ -57,6 +52,7 @@ func (l *Lexer) appendNameToken(name string) {
 	var new_result bytes.Buffer
 	new_result.WriteString(name)
 	var t TokenType
+	name = strings.ToLower(name)
 	for _, keyword := range keywords {
 		if name == keyword {
 			t = KEYWORD
@@ -67,7 +63,7 @@ func (l *Lexer) appendNameToken(name string) {
 		if name == "true" || name == "false" {
 			t = BOOL
 		} else {
-			t = NAME
+			t = WORD
 		}
 	}
 	l.appendToken(t, new_result)
@@ -200,7 +196,7 @@ func (l *Lexer) collectTokens() {
 // Print tokens that collected by collectTokens
 // func (l *Lexer) printTokens() {
 // 	fmt.Println("\x1b[1;32mTokens:\x1b[0m")
-// 	for _, token := range l.Tokens {
+// 	for _, token := range l.tokens {
 // 		fmt.Printf("\x1b[1;37m%v: %v\x1b[0m\n", token.T, token.V.String())
 // 	}
 // }

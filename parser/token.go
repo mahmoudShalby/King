@@ -7,7 +7,7 @@ type TokenType uint8
 const (
 	NOTHING TokenType = iota
 	KEYWORD
-	NAME
+	WORD
 	INT
 	FLOAT
 	STRING
