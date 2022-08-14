@@ -1,9 +1,12 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"os/exec"
+)
 
 func main() {
-	Table()
+	Colors()
 }
 
 func Table() {
@@ -13,7 +16,8 @@ func Table() {
 }
 
 func Colors() {
+	exec.Command("color").Run()
 	for i := 0; i < 40; i++ {
-		fmt.Printf("%d: \x1b[%dmHello world\x1b[0m\n", i, i)
+		fmt.Printf("%d: \033[%dmHello world\033[0m\n", i, i)
 	}
 }

@@ -1,5 +1,1 @@
-a = 1234
-b = 12.34
-
-if a is 5
-	print a
+name name of car = 5

@@ -189,14 +189,3 @@ func (l *Lexer) collectTokens() {
 		}
 	}
 }
-
-// UnComment this and run this function at the end of (*Lexer).Init function
-// if you want to see tokens after collect it
-
-// Print tokens that collected by collectTokens
-// func (l *Lexer) printTokens() {
-// 	fmt.Println("\x1b[1;32mTokens:\x1b[0m")
-// 	for _, token := range l.tokens {
-// 		fmt.Printf("\x1b[1;37m%v: %v\x1b[0m\n", token.T, token.V.String())
-// 	}
-// }
