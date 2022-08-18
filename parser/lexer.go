@@ -53,6 +53,8 @@ func (l *Lexer) appendNameToken(name string) {
 	new_result.WriteString(name)
 	var t TokenType
 	name = strings.ToLower(name)
+	var new_name bytes.Buffer
+	new_name.WriteString(name)
 	for _, keyword := range keywords {
 		if name == keyword {
 			t = KEYWORD
@@ -66,7 +68,7 @@ func (l *Lexer) appendNameToken(name string) {
 			t = WORD
 		}
 	}
-	l.appendToken(t, new_result)
+	l.appendToken(t, new_name)
 }
 
 // Collect names then append it with (*Lexer).appendNameToken
@@ -162,8 +164,7 @@ func (l *Lexer) collectString() {
 // Collect any thing isn't letter, number or whitespace
 func (l *Lexer) collectPunctuation() {
 	var result bytes.Buffer
-	l.next()
-	for !(l.isCurrentItemLetter() || l.isCurrentItemNumber() || l.isCurrentItemWhitespace()) {
+	for !l.isCurrentItemLetter() && !l.isCurrentItemNumber() && !l.isCurrentItemWhitespace() {
 		result.WriteRune(l.currentItem)
 		l.next()
 	}
@@ -184,6 +185,9 @@ func (l *Lexer) collectTokens() {
 			l.collectTab()
 		case l.currentItem == '"':
 			l.collectString()
+		case l.currentItem == ' ':
+			l.next()
+			continue
 		default:
 			l.collectPunctuation()
 		}

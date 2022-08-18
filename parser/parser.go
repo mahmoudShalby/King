@@ -59,7 +59,7 @@ func (p *Parser) next() {
 
 func (p *Parser) collectName() {
 	p.next()
-	if p.currentItem.T == WORD {
+	if p.currentItem.T == WORD || (p.currentItem.T == KEYWORD && p.currentItem.V.String() == "name") {
 		name := p.currentItem.V.String()
 		println(name)
 	} else {
