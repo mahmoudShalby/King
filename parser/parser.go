@@ -59,10 +59,18 @@ func (p *Parser) next() {
 
 func (p *Parser) collectName() {
 	p.next()
-	if p.currentItem.T == WORD || (p.currentItem.T == KEYWORD && p.currentItem.V.String() == "name") {
+	switch {
+	case p.currentItem.T == WORD:
 		name := p.currentItem.V.String()
 		println(name)
-	} else {
+	case p.currentItem.T == KEYWORD:
+		switch p.currentItem.V.String() {
+		case "of":
+			fmt.Println("of keyword.")
+		}
+		name := p.currentItem.V.String()
+		println(name)
+	default:
 		p.printError("You should write a name for the word")
 	}
 }

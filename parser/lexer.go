@@ -8,6 +8,8 @@ import (
 // Name that will get type KEYWORD by lexer
 var keywords = [...]string{
 	"name",
+	"of",
+	"is",
 }
 
 // Lexer's base object
